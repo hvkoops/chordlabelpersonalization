@@ -26,22 +26,23 @@ from keras.engine.topology import Layer
 import pandas as pd
 from src import sal
 
-print( '--- Loading data sets')
 ds = 'casd'
-gtchords = np.load('data/'+ds+'/allgtsuperchords.npy')[::1]
-allchords = np.load('data/'+ds+'/allsuperchords.npy')[:,::1]
-allcqt = np.load('data/'+ds+'/allsupercqt.npy')[::1]
-fallchords = np.array([[fixgt(a) for a in l] for l in allchords])
-fgtallchords = np.array([fixgt(a) for a in gtchords])
-testpairs = set([tuple(sorted((i,j))) for i in np.arange(allchords.shape[0]) for j in np.arange(1,allchords.shape[0]) if (i != j)])
+print( '--- Loading data sets: ', ds)
+
+gtchords     = loadset('../data/'+ds+'/allgtsuperchords.npy')[::1]
+allcqt       = loadset('../data/'+ds+'/allsupercqt.npy')[::1]
+allchords    = loadset('../data/'+ds+'/allsuperchords.npy')[:,::1]
+fallchords   = fixall_annotators(allchords)
+fgtallchords = fixall_gt(gtchords)
+testpairs    = createtestpairs(allchords)
 
 print( '--- Loading SHIP data sets')
-hchords = np.array([np.array([labeltoSHIP3(f) for f in a]).mean(axis=0) for a in fallchords.T])
-gthchords = np.array([labeltoSHIP3(f) for f in gtchords])
-vocabs = np.array([np.unique(v) for v in fallchords])
-hvocabs = np.array([[labeltoSHIP3(c) for c in v] for v in vocabs])
-gtvocab = np.unique(fgtallchords)
-gthvocab = np.array([labeltoSHIP3(c) for c in gtvocab])
+hchords   = create_hchords_annotators(fallchords)
+gthchords = create_hchords_gt(gtchords)
+vocabs    = create_annotators_vocabs(fallchords, ship=False)
+hvocabs   = create_annotators_vocabs(fallchords, ship=True)
+gtvocab   = create_gt_vocabs(fgtallchords, ship=False)
+gthvocab  = create_gt_vocabs(fgtallchords, ship=True)
 
 print( '--- Randomizing data sets')
 trainix, testix, evalix = makerandomsets([.65, .25, .10], allcqt, random_state=24)
@@ -54,14 +55,13 @@ x_eval = np.hstack((allcqt[evalix],evalix[np.newaxis].T))
 y_eval = hchords[evalix]
 gty_eval = gthchords[evalix]
 
-batch_size = 512
+batch_size = 128
 
 print('--- Building models')
 annmodel = makemodel(insize=(x_train.shape[1],), outsize=hchords.shape[1])
 gtmodel  = makemodel(insize=(x_train.shape[1],), outsize=hchords.shape[1])
 annmodel.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
 gtmodel.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
-
 
 print('-- Training')
 epochs = 30

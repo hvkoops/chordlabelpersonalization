@@ -108,6 +108,15 @@ def makemodel(insize, outsize):
     model = Model(inputs=a, outputs=m)
     return(model)
 
+
+# load datasets
+def loadset(fn):
+    return(np.load(fn))
+
+def createtestpairs(allchords):
+    testset = set([tuple(sorted((i,j))) for i in np.arange(allchords.shape[0]) for j in np.arange(1,allchords.shape[0]) if (i != j)])
+    return(testset)
+
 def getmaxchords(hvocabs, vocabs, ships):
     ix = 0
     if len(hvocabs.shape) > 1: 
@@ -193,6 +202,37 @@ def labeltochroma(lab):
     rot, chn, b = mir_eval.chord.encode(lab)
     return np.roll(chn,rot)    
 
+# fix the chord labels for all annotators
+def fixall_annotators(allchords):
+    fallchords = np.array([[fixgt(a) for a in l] for l in allchords])
+    return(fallchords)
+
+# fix the chord labels for all ground truth chords
+def fixall_gt(gtchords):
+    fgtallchords = np.array([fixgt(a) for a in gtchords])
+    return(fgtallchords)
+
+# create hierarchical representations for all annotators' chords
+def create_hchords_annotators(fallchords):
+    hchords = np.array([np.array([labeltoSHIP3(f) for f in a]).mean(axis=0) for a in fallchords.T])
+    return(hchords)
+
+# create hierarchical representations for all ground truth chords
+def create_hchords_gt(gtchords):
+    gthchords = np.array([labeltoSHIP3(f) for f in gtchords])
+    return(gthchords)
+
+def create_annotators_vocabs(fallchords, ship=False):
+    vocabs = np.array([np.unique(v) for v in fallchords])
+    if ship:
+        vocabs = np.array([[labeltoSHIP3(c) for c in v] for v in vocabs])
+    return(vocabs)
+
+def create_gt_vocabs(fgtallchords, ship=False):
+    gtvocab = np.unique(fgtallchords)
+    if ship:
+        gtvocab = np.array([labeltoSHIP3(c) for c in gtvocab])
+    return(gtvocab)
 
 def fixgt(lab):
     # if '/' in lab:
