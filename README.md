@@ -24,7 +24,7 @@ If you want to reference this research, please refer to the following papers.
   journal={Neural Computing and Applications},
   pages={1--11},
   year={2018},
-  publisher={Springer}
+  publisher={Springer},
   url={https://doi.org/10.1007/s00521-018-3703-y}
 }
 ```
