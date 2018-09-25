@@ -2,7 +2,7 @@
 
 ![alt tag](./assets/pipeline.png)
 
-This project hosts the academic research code for our [[**Neural Computing and Applications**]](https://rdcu.be/7sr2) publication and a prevous [[**Deep Learning for Music@IJCNN 2017**]](http://dorienherremans.com/dlm2017/) conference paper. 
+This project hosts the academic research code for our [[**Neural Computing and Applications**]](https://rdcu.be/7sr2) publication and a previous [[**Deep Learning for Music@IJCNN 2017**]](http://dorienherremans.com/dlm2017/) conference paper. 
 
 The increasing accuracy of automatic chord estimation systems, the availability of vast amounts of heterogeneous 
 reference annotations, and insights from [[annotator subjectivity research]](http://www.cs.uu.nl/research/techreps/repo/CS-2017/2017-018.pdf) make chord label personalization increasingly 
